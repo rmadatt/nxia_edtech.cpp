@@ -1,0 +1,13 @@
+Deployment Instructions
+Save the above code as edtech_app.html.
+Host it on any web server (e.g., GitHub Pages, Netlify, or a local server like XAMPP).
+Open the file in a browser to use the app.
+Features
+Input Form: Teachers can add or update student scores (1-5) for up to 500 students.
+Data Persistence: Uses local storage to save student data.
+Radar Chart: Displays all students' scores with different colors using Chart.js.
+Edit/Delete: Select a student from a dropdown to edit or delete their data.
+Validation: Ensures all fields are filled and scores are valid (1-5).
+Responsive Design: Works on desktop and mobile devices.
+Error Handling: Alerts for invalid inputs or maximum student limit.
+This app is production-ready, lightweight, and requires no backend, making it immediately deployable for a school of 500 students.
