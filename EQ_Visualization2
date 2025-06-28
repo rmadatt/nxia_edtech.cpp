@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdTech Student Skills Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #chartContainer {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        canvas {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Student Skills Tracker</h1>
+    <div class="form-container">
+        <h2>Add/Edit Student Scores</h2>
+        <div class="form-group">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" placeholder="Enter student name" required>
+        </div>
+        <div class="form-group">
+            <label for="sportsSkills">Sports Skills (1-5):</label>
+            <select id="sportsSkills" required>
+                <option value="">Select score</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="eq">EQ (1-5):</label>
+            <select id="eq" required>
+                <option value="">Select score</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="leadership">Leadership Qualities (1-5):</label>
+            <select id="leadership" required>
+                <option value="">Select score</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="emotionalRegulation">Emotional Regulation (1-5):</label>
+            <select id="emotionalRegulation" required>
+                <option value="">Select score</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="resilience">Resilience to Change (1-5):</label>
+            <select id="resilience" required>
+                <option value="">Select score</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <button onclick="addStudent()">Add/Update Student</button>
+        <div class="form-group">
+            <label for="selectStudent">Select Student to View/Edit:</label>
+            <select id="selectStudent" onchange="loadStudentData()">
+                <option value="">Select a student</option>
+            </select>
+        </div>
+        <button onclick="deleteStudent()">Delete Selected Student</button>
+    </div>
+    <div id="chartContainer">
+        <h2>Student Skills Radar Chart</h2>
+        <canvas id="radarChart"></canvas>
+    </div>
+
+    <script>
+        // Initialize Chart.js radar chart
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        let radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Sports Skills', 'EQ', 'Leadership Qualities', 'Emotional Regulation', 'Resilience to Change'],
+                datasets: []
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: { display: true },
+                        suggestedMin: 0,
+                        suggestedMax: 5,
+                        ticks: { stepSize: 1 }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' }
+                }
+            }
+        });
+
+        // Load students from localStorage
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+
+        // Preload sample data
+        if (students.length === 0) {
+            students = [
+                { name: "John Ko", scores: [5, 4, 5, 2, 2] },
+                { name: "Sarah Lee", scores: [3, 5, 4, 3, 4] },
+                { name: "Ahmed Khan", scores: [4, 3, 3, 4, 3] },
+                { name: "Emma Chen", scores: [2, 4, 3, 5, 4] },
+                { name: "Liam Patel", scores: [4, 2, 4, 3, 5] },
+                { name: "Olivia Kim", scores: [3, 5, 2, 4, 3] },
+                { name: "Noah Singh", scores: [5, 3, 5, 2, 4] },
+                { name: "Mia Wong", scores: [2, 4, 3, 5, 2] },
+                { name: "Ethan Park", scores: [4, 3, 4, 3, 4] },
+                { name: "Ava Gupta", scores: [3, 5, 2, 4, 3] }
+            ];
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+        // Update student dropdown
+        function updateStudentDropdown() {
+            const select = document.getElementById('selectStudent');
+            select.innerHTML = '<option value="">Select a student</option>';
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.name;
+                option.textContent = student.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Add or update student
+        function addStudent() {
+            const name = document.getElementById('studentName').value.trim();
+            const sports = parseInt(document.getElementById('sportsSkills').value);
+            const eq = parseInt(document.getElementById('eq').value);
+            const leadership = parseInt(document.getElementById('leadership').value);
+            const emotional = parseInt(document.getElementById('emotionalRegulation').value);
+            const resilience = parseInt(document.getElementById('resilience').value);
+
+            if (!name || isNaN(sports) || isNaN(eq) || isNaN(leadership) || isNaN(emotional) || isNaN(resilience)) {
+                alert('Please fill in all fields with valid scores.');
+                return;
+            }
+
+            const studentIndex = students.findIndex(s => s.name === name);
+            const scores = [sports, eq, leadership, emotional, resilience];
+
+            if (studentIndex !== -1) {
+                students[studentIndex].scores = scores; // Update existing student
+            } else {
+                if (students.length >= 500) {
+                    alert('Maximum student limit (500) reached.');
+                    return;
+                }
+                students.push({ name, scores }); // Add new student
+            }
+
+            localStorage.setItem('students', JSON.stringify(students));
+            updateChart();
+            updateStudentDropdown();
+            clearForm();
+        }
+
+        // Load student data into form
+        function loadStudentData() {
+            const name = document.getElementById('selectStudent').value;
+            const student = students.find(s => s.name === name);
+            if (student) {
+                document.getElementById('studentName').value = student.name;
+                document.getElementById('sportsSkills').value = student.scores[0];
+                document.getElementById('eq').value = student.scores[1];
+                document.getElementById('leadership').value = student.scores[2];
+                document.getElementById('emotionalRegulation').value = student.scores[3];
+                document.getElementById('resilience').value = student.scores[4];
+            } else {
+                clearForm();
+            }
+        }
+
+        // Delete selected student
+        function deleteStudent() {
+            const name = document.getElementById('selectStudent').value;
+            if (!name) {
+                alert('Please select a student to delete.');
+                return;
+            }
+            students = students.filter(s => s.name !== name);
+            localStorage.setItem('students', JSON.stringify(students));
+            updateChart();
+            updateStudentDropdown();
+            clearForm();
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('studentName').value = '';
+            document.getElementById('sportsSkills').value = '';
+            document.getElementById('eq').value = '';
+            document.getElementById('leadership').value = '';
+            document.getElementById('emotionalRegulation').value = '';
+            document.getElementById('resilience').value = '';
+            document.getElementById('selectStudent').value = '';
+        }
+
+        // Update radar chart
+        function updateChart() {
+            const colors = [
+                'rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)', 'rgba(153, 102, 255, 0.5)', 'rgba(255, 159, 64, 0.5)',
+                'rgba(199, 199, 199, 0.5)', 'rgba(83, 102, 255, 0.5)', 'rgba(255, 99, 71, 0.5)',
+                'rgba(144, 238, 144, 0.5)'
+            ];
+
+            radarChart.data.datasets = students.map((student, index) => ({
+                label: student.name,
+                data: student.scores,
+                backgroundColor: colors[index % colors.length],
+                borderColor: colors[index % colors.length].replace('0.5', '1'),
+                borderWidth: 2
+            }));
+
+            radarChart.update();
+        }
+
+        // Initialize
+        updateStudentDropdown();
+        updateChart();
+    </script>
+</body>
+</html>
