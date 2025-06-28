@@ -1,0 +1,54 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from math import pi
+
+# Sample data for 10 students
+students = [
+    {"name": "John Ko", "scores": [5, 4, 5, 2, 2]},
+    {"name": "Sarah Lee", "scores": [3, 5, 4, 3, 4]},
+    {"name": "Ahmed Khan", "scores": [4, 3, 3, 4, 3]},
+    {"name": "Emma Chen", "scores": [2, 4, 3, 5, 4]},
+    {"name": "Liam Patel", "scores": [4, 2, 4, 3, 5]},
+    {"name": "Olivia Kim", "scores": [3, 5, 2, 4, 3]},
+    {"name": "Noah Singh", "scores": [5, 3, 5, 2, 4]},
+    {"name": "Mia Wong", "scores": [2, 4, 3, 5, 2]},
+    {"name": "Ethan Park", "scores": [4, 3, 4, 3, 4]},
+    {"name": "Ava Gupta", "scores": [3, 5, 2, 4, 3]},
+]
+
+# Categories for radar chart
+categories = ['Sports Skills', 'EQ', 'Leadership Qualities', 'Emotional Regulation', 'Resilience to Change']
+N = len(categories)
+
+# Compute angle for each category
+angles = [n / float(N) * 2 * pi for n in range(N)]
+angles += angles[:1]  # Complete the loop
+
+# Initialize the radar chart
+fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+
+# Draw one axe per variable and add labels
+plt.xticks(angles[:-1], categories)
+
+# Draw ylabels
+ax.set_rlabel_position(0)
+plt.yticks([1, 2, 3, 4, 5], ["1", "2", "3", "4", "5"], color="grey", size=7)
+plt.ylim(0, 5)
+
+# Plot each student's data
+colors = plt.cm.tab10(np.linspace(0, 1, len(students)))  # Different colors for each student
+for idx, student in enumerate(students):
+    values = student['scores']
+    values += values[:1]  # Complete the loop
+    ax.plot(angles, values, linewidth=2, linestyle='solid', label=student['name'], color=colors[idx])
+    ax.fill(angles, values, color=colors[idx], alpha=0.1)
+
+# Add a legend
+plt.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
+
+# Set title
+plt.title('Student Skills Radar Chart', size=20, color='black', y=1.1)
+
+# Save and show the plot
+plt.savefig('radar_chart.png', bbox_inches='tight')
+plt.show()
