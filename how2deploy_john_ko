@@ -1,0 +1,10 @@
+Deployment Instructions
+Save the code as john_ko_radar.html.
+Host it on any web server (e.g., GitHub Pages, Netlify, or a local server like XAMPP).
+Open the file in a browser to view John Ko's radar chart.
+Features
+Displays a single radar chart for John Ko with his scores.
+Uses Chart.js for a clean, responsive visualization.
+Simple, lightweight, and production-ready with no external dependencies beyond the Chart.js CDN.
+No user input required; data is hardcoded for reliability.
+Responsive design works on desktop and mobile devices.
